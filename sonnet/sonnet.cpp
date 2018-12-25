@@ -63,32 +63,32 @@ bool get_word(const char *input_line, int word_number, char *output_word) {
    can be reset (e.g. to start issuing rhyme scheme letters for a new
    poem) by calling rhyming_letter(RESET). */
 
-char rhyming_letter(const char *ending) {
+// char rhyming_letter(const char *ending) {
 
-  // the next rhyming letter to be issued (persists between calls)
-  static char next = 'a';
-  // the table which maps endings to letters (persists between calls)
-  static map<string, char> lookup;
+//   // the next rhyming letter to be issued (persists between calls)
+//   static char next = 'a';
+//   // the table which maps endings to letters (persists between calls)
+//   static map<string, char> lookup;
 
-  // providing a way to reset the table between poems
-  if (ending == RESET) {
-    lookup.clear();
-    next = 'a';
-    return '\0';
-  }
+//   // providing a way to reset the table between poems
+//   if (ending == RESET) {
+//     lookup.clear();
+//     next = 'a';
+//     return '\0';
+//   }
 
-  string end(ending);
+//   string end(ending);
 
-  // if the ending doesn't exist, add it, and issue a new letter
-  if (lookup.count(end) == 0) {
-    lookup[end]=next;
-    assert(next <= 'z');
-    return next++;
-  }
+//   // if the ending doesn't exist, add it, and issue a new letter
+//   if (lookup.count(end) == 0) {
+//     lookup[end]=next;
+//     assert(next <= 'z');
+//     return next++;
+//   }
 
-  // otherwise return the letter corresponding to the existing ending
-  return lookup[end];
-}
+//   // otherwise return the letter corresponding to the existing ending
+//   return lookup[end];
+// }
 
 /* START WRITING YOUR FUNCTION BODIES HERE */
 int count_words(const char *input_line) {
@@ -211,4 +211,35 @@ string identify_sonnet(const char * filename) {
   if (!strcmp(sonnet, reference)) return "Spenserian";
 
   return "Unknown";
+}
+
+char rhyming_letter(const char *ending) {
+
+  // the next rhyming letter to be issued (persists between calls)
+  static char next = 'a';
+  // the table which maps endings to letters (persists between calls)
+  static char lookup[26][512];
+
+  // providing a way to reset the table between poems
+  if (ending == RESET) {
+    for (int i = 0; i < 26; i++) {
+      *lookup[i] = '\0';
+    }
+    next = 'a';
+    return '\0';
+  }
+
+  string end(ending);
+
+  // if the ending exist, return the letter corresponding to the existing ending
+  for (int i = 0; i < 26; i++) {
+    if (!strcmp(lookup[i], ending)) {
+      return i + 'a';
+    }
+  }
+
+  // otherwise, add it, and issue a new letter
+  strcpy(lookup[next - 'a'], ending);
+  assert(next <= 'z');
+  return next++;
 }
