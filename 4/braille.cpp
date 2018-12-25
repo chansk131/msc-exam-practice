@@ -2,6 +2,7 @@
 #include <cctype>
 #include <map>
 #include <iostream>
+#include <cstring>
 
 using namespace std;
 
@@ -81,7 +82,6 @@ void print_braille(const char *text, ostream &cout) {
   char braille[512];
   encode(text, braille);
   // print braille
-  int rev = 0;
   string braille_1, braille_2, braille_3;
   
   string str_braille(braille);
@@ -98,22 +98,22 @@ void print_braille(const char *text, ostream &cout) {
     braille_3 += str_braille[5 + 6*i];
   }
 
-  for (int i = 0; i < braille_1.length()/2; i++) {
+  for (unsigned int i = 0; i < braille_1.length()/2; i++) {
     cout << braille_1[0 + 2*i] << braille_1[1 + 2*i] << " ";
   }
   cout << endl;
-  for (int i = 0; i < braille_2.length()/2; i++) {
+  for (unsigned int i = 0; i < braille_2.length()/2; i++) {
     cout << braille_2[0 + 2*i] << braille_2[1 + 2*i] << " ";
   }
   cout << endl;
-  for (int i = 0; i < braille_3.length()/2; i++) {
+  for (unsigned int i = 0; i < braille_3.length()/2; i++) {
     cout << braille_3[0 + 2*i] << braille_3[1 + 2*i] << " ";
   }
   cout << endl;
 
   // print text
   string str_text(text);
-  for (int i = 0; i < str_text.length(); i++) {
+  for (unsigned int i = 0; i < str_text.length(); i++) {
     if (isdigit(str_text[i]) || isupper(str_text[i])) cout << "   ";
     cout << str_text[i] << "  ";
   }
