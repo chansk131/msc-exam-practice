@@ -46,7 +46,7 @@ string sort_str(string str)
 {
   string sorted;
 
-  for (int i = 0; i < str.length(); i++)
+  for (unsigned int i = 0; i < str.length(); i++)
   {
     if (!isalpha(str[i])) continue;
     if (i > 0)
@@ -55,7 +55,7 @@ string sort_str(string str)
         sorted += toupper(str[i]);
       }
       else {
-        for (int j = 0; j < sorted.length(); j++) {
+        for (unsigned int j = 0; j < sorted.length(); j++) {
           if (sorted[j] > toupper(str[i]))
           {
             sorted.insert(sorted.begin()+j, toupper(str[i]));
