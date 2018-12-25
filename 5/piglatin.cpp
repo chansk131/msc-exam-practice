@@ -2,6 +2,7 @@
 #include <string>
 #include <fstream>
 #include <iostream>
+#include <cstring>
 #include "piglatin.h"
 
 using namespace std;
