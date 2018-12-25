@@ -7,70 +7,55 @@
 using namespace std;
 
 void prepare(const char* input, char* output) {
-  string temp;
-
-  for (int i = 0; *(input + i); i++) {
-    if (isalnum(*(input + i))) {
-      if (isalpha(*(input + i))) {
-        temp += toupper(*(input + i));
-      } else {
-        temp += *(input + i);
-      }
-    }
+  int count = 0;
+  // convert store alpha numeric to upper in output
+  for (int i = 0; input[i]; i++) {
+    if (isalnum(input[i]))
+      output[count++] = toupper(input[i]);
   }
 
-  if (temp.length() % 2) temp += 'X';
+  // add 'X' if odd length
+  if (count % 2)
+    output[count++] = 'X';
 
-  strcpy(output, temp.c_str());
+  // add sentinel
+  output[count] = '\0';
 }
 
-bool is_duplicated(char input, const char* reference) {
-  string ref(reference);
-  int ref_len = ref.length();
-  for (int i = 0; i < ref_len; i++) {
-    if (input == ref[i]) return true;
+bool occurs_before(const char str[], char letter, int pos) {
+  for (int i = 0; i < pos; i++) {
+    if (str[i] == letter) return true;
   }
   return false;
 }
 
 void grid(const char* codeword, char square[6][6]) {
   string alphanum("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
-
   string temp(codeword);
+  int temp_len;
 
-  int temp_len = temp.length();
-
-  if (temp_len % 2) {
-    temp_len--;
+  if (temp.length() % 2) {
+    temp.pop_back();
   }
+  temp += alphanum;
+  temp_len = temp.length();
 
   int temp_index = 0, str_len = temp_len;
-  for (int i = 0; i < temp_len; i++) {
-    for (int j = 0; j < i; j++) {
-      if (temp[temp_index] == square[j % 6][j - (j % 6) * 6]) {
-        temp_index++;
-        str_len--;
-        break;
-      }
+  for (int i = 0; i < 36; i++) {
+    while (occurs_before(temp.c_str(), temp[temp_index], temp_index)) {
+      temp_index++;
+      str_len--;
     }
     square[i % 6][i - (i % 6) * 6] = temp[temp_index];
     temp_index++;
   }
-
-  int ref_index = 0;
-  for (int i = str_len; i < 36; i++) {
-    while (is_duplicated(alphanum[ref_index], codeword)) {
-      ref_index++;
-    }
-    square[i%6][i - (i%6)*6] = alphanum[ref_index];
-    ref_index++;
-  }
 }
 
 void bigram(char square[6][6], const char inchar1, const char inchar2, char &outchar1, char &outchar2) {
+  bool isFinished = false;
   int row1 = -1, col1 = -1, row2 = -1, col2 = -1;
-  for (int i = 0; i < 6; i++) {
-    for (int j = 0; j < 6; j++) {
+  for (int i = 0; i < 6 && !isFinished; i++) {
+    for (int j = 0; j < 6 && !isFinished; j++) {
       if (square[i][j] == inchar1) {
         row1 = i;
         col1 = j;
@@ -78,9 +63,9 @@ void bigram(char square[6][6], const char inchar1, const char inchar2, char &out
         row2 = i;
         col2 = j;
       } 
-      // else if (row1 + col1 + row2 + col2 == -4) {
-      //   break;
-      // }
+      else if (row1 >=0 && col1 >=0 && row2 >=0 && col2 >= 0) {
+        isFinished = true;
+      }
 
     }
   }
