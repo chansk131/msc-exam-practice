@@ -4,6 +4,7 @@
 #include <cassert>
 #include <map>
 #include <string>
+#include <fstream>
 
 using namespace std;
 
@@ -90,3 +91,124 @@ char rhyming_letter(const char *ending) {
 }
 
 /* START WRITING YOUR FUNCTION BODIES HERE */
+int count_words(const char *input_line) {
+  int count = 0;
+  if (!*input_line) return count;
+  char word[512];
+  count++;
+  while (get_word(input_line, count, word)) {
+    count++;
+  }
+  return (count - 1);
+}
+
+int get_last_vowel(const char * word) {
+  char phonetic[512];
+  int position = 1, last_vowel_position = -1;
+  while (get_word(word, position, phonetic)) {
+    switch (phonetic[0]) {
+      case 'A':
+      case 'E':
+      case 'I':
+      case 'O':
+      case 'U':
+        last_vowel_position = position;
+    }
+    position++;
+  }
+  return last_vowel_position;
+}
+
+void get_ending(const char * word, char * phonetic_ending, int position) {
+  string temp;
+  char phonetic[512];
+  while (get_word(word, position, phonetic)) {
+    temp += phonetic;
+    position++;
+  }
+  strcpy(phonetic_ending, temp.c_str());
+}
+
+bool find_phonetic_ending(const char * word, char * phonetic_ending) {
+  bool success = false;
+  ifstream in;
+  in.open("dictionary.txt");
+  if (in.fail()) {
+    cerr << "Cannot open dictionary.txt file";
+    in.close();
+    return success;
+  }
+
+  string line;
+  char first[512];
+  int first_vowel_position;
+  while (!in.eof()) {
+    getline(in, line);
+    get_word(line.c_str(), 1, first);
+    if (!strcmp(word, first)) {
+      // get first vowel
+      first_vowel_position = get_last_vowel(line.c_str());
+      get_ending(line.c_str(), phonetic_ending, first_vowel_position);
+      success = true;
+      break;
+    }
+  }
+  in.close();
+  return success;
+}
+
+int get_last_word_position(const char * word) {
+  int position = 1;
+  char last_word[512];
+  while (get_word(word, position, last_word)) {
+    position++;
+  }
+  return position - 1;
+}
+
+bool find_rhyme_scheme(const char * filename, char * scheme) {
+  bool success = false;
+  ifstream in;
+  in.open(filename);
+  if (in.fail()) {
+    cerr << "Cannot open " << filename << " file";
+    in.close();
+    return success;
+  }
+
+  rhyming_letter(RESET);
+  string line;
+  char word[512], phonetics[512];
+  int word_count = 1, scheme_count = 0, last_word_position;
+  while (!in.eof()) {
+    getline(in, line);
+    // cout << line << endl;
+    word_count = 1;
+    last_word_position = get_last_word_position(line.c_str());
+    get_word(line.c_str(), last_word_position, word);
+    if (find_phonetic_ending(word, phonetics)) {
+      // cout << phonetics << endl;
+      scheme[scheme_count++] = rhyming_letter(phonetics);
+    }
+  }
+  scheme[scheme_count] = '\0';
+  in.close();
+  return true;
+}
+
+string identify_sonnet(const char * filename) {
+
+  char sonnet[512], reference[512];
+
+  find_rhyme_scheme(filename, sonnet);
+  find_rhyme_scheme("shakespeare.txt", reference);
+  if (!strcmp(sonnet, reference)) return "Shakespearean";
+
+  find_rhyme_scheme("petrarch.txt", reference);
+  if (!strcmp(sonnet, reference)) return "Petrarchan";
+
+  find_rhyme_scheme("spenser.txt", reference);
+  if (!strcmp(sonnet, reference)) return "Spenserian";
+
+  return "Unknown";
+}
