@@ -7,11 +7,11 @@ $(EXE): $(OBJ)
 	$(CXX) $^ -o $@
 
 %.o: %.cpp
-	$(CXX) $(CXXFLAGS) -g -c $<
+	$(CXX) $(CXXFLAGS) -c $<
 
 -include $(OBJ:.o=.d)
 
 clean:
-	rm -f $(OBJ) $(EXE) $(OBJ:.o=.d) errors.o errors.d
+	rm -f $(OBJ) $(EXE) $(OBJ:.o=.d)
 
 .PHONY: clean
