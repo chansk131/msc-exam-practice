@@ -4,6 +4,7 @@
 #include <cctype>
 #include <string>
 #include <iostream>
+#include <cstring>
 
 void prepare(const std::string input, char * output);
 void grid(const std::string codeword, char square[6][6]);
