@@ -94,7 +94,7 @@ void print_maze(char **m, int height, int width) {
 }
 
 /* new function */
-bool find_marker(const char ch, char **maze, int height, int width, int &row, int &column) {
+bool find_marker(const char ch, char **maze, const int height, const int width, int &row, int &column) {
   for (int r=0; r<height; r++) {
     for (int c=0; c<width; c++) 
       if (maze[r][c] == ch) {
@@ -103,6 +103,8 @@ bool find_marker(const char ch, char **maze, int height, int width, int &row, in
         return true;
       }
   }
+  row = -1;
+  column = -1;
   return false;
 }
 
@@ -142,21 +144,6 @@ bool valid_solution(const char * path, char **maze, int height, int width) {
   }
 
   if (row == exit_row && col == exit_column) return true;
-  return false;
-}
-
-bool get_valid_move(char **maze, int height, int width, int current_row, int current_column, const char end, int &next_row, int &next_col, int i = 0) {
-  static char direction[4] = {'N', 'S', 'E', 'W'};
-  for (; i < 4; i++) {
-    next_row = current_row;
-    next_col = current_column;
-    get_direction(direction[i], next_row, next_col);
-    if (next_row < 0 || next_row >= height) continue;
-    if (next_col < 0 || next_col >= height) continue;
-    if (maze[next_row][next_col] != ' ' && maze[next_row][next_col] != end)
-      continue;
-    return true;
-  }
   return false;
 }
 

@@ -1,4 +1,4 @@
-/* You are pre-supplied with the functions below. Add your own 
+/* You are pre-supplied with the functions below. Add your own
    function prototypes to the end of this file. */
 
 /* helper functions to allocate and deallocate dynamic 2D arrays */
@@ -11,7 +11,9 @@ char **load_maze(const char *filename, int &height, int &width);
 /* pre-supplied function to print a maze */
 void print_maze(char **m, int height, int width);
 
-bool find_marker(const char ch, char **maze, int height, int width, int &row, int &column);
+bool find_marker(const char ch, char **maze, const int height, const int width,
+                 int &row, int &column);
 
-bool valid_solution(const char * path, char **maze, int height, int width);
-char* find_path(char **maze, int height, int width, const char start, const char end);
+bool valid_solution(const char *path, char **maze, int height, int width);
+char *find_path(char **maze, int height, int width, const char start,
+                const char end);
