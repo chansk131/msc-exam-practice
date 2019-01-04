@@ -4,5 +4,5 @@
 /* insert your function prototypes here */
 int frequency(const char * target);
 int edit_distance(const char * a, const char * b);
-int edit_distance(const char * a, const char * b, int length_a, int length_b);
+int edit_distance(const char * a, const char * b, int length_a, int length_b, int cache[MAX_LENGTH][MAX_LENGTH]);
 bool spell_correct(const char * word, char * fixed);
