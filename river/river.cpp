@@ -112,7 +112,8 @@ const char *status_description(int code) {
 
 /* insert your functions here */
 bool get_left_count(const string left, int &left_missionary, int &left_cannibal, int &boat_position) {
-  if (left.size() > 7) {
+  int left_size = left.size();
+  if (left_size > 7) {
     return false;
   }
   
@@ -120,7 +121,7 @@ bool get_left_count(const string left, int &left_missionary, int &left_cannibal,
   left_missionary = count(left.begin(), left.end(), 'M');
   left_cannibal = count(left.begin(), left.end(), 'C');
 
-  if (boat_position > 1 || left.size() != boat_position + left_missionary + left_cannibal) {
+  if (boat_position > 1 || left_size != boat_position + left_missionary + left_cannibal) {
     return false;
   }
 
@@ -128,13 +129,14 @@ bool get_left_count(const string left, int &left_missionary, int &left_cannibal,
 }
 
 bool get_boat_count(const string boat, int &boat_missionary, int &boat_cannibal) {
-  if (boat.size() > 2) {
+  int boat_size = boat.size();
+  if (boat_size > 2) {
     return false;
   }
   boat_missionary = count(boat.begin(), boat.end(), 'M');
   boat_cannibal = count(boat.begin(), boat.end(), 'C');
 
-  if (boat.size() != boat_missionary + boat_cannibal) {
+  if (boat_size != boat_missionary + boat_cannibal) {
     return false;
   }
 
