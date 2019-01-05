@@ -9,7 +9,7 @@
 using namespace std;
 
 /* insert your function definitions here */
-int frequency(const char* target) {
+int frequency(string target) {
   ifstream in;
   in.open("words.dat");
 
@@ -22,8 +22,7 @@ int frequency(const char* target) {
   string word;
   while (!in.eof()) {
     in >> count >> word;
-
-    if (strcmp(target, word.c_str()) == 0) {
+    if (word == target) {
       in.close();
       return count;
     }
@@ -78,7 +77,7 @@ bool spell_correct(const char* word, char* fixed) {
   in.open("words.dat");
 
   int lowest_distance = 0, highest_freq;
-  string best_suggestion;
+  string best_suggestion = "";
 
   if (!in) {
     cerr << "Cannot open file words.dat" << endl;
@@ -106,3 +105,35 @@ bool spell_correct(const char* word, char* fixed) {
   strcpy(fixed, best_suggestion.c_str());
   return true;
 }
+
+int edit_distance_bonus(const char* a, const char* b, int status) {
+  static int cache[MAX_LENGTH][MAX_LENGTH];
+  if (strcmp(a, b) == 0) return 0;
+
+  int i = strlen(a);
+  int j = strlen(b);
+
+  if (min(i, j) == 0) {
+    return max(i, j);
+  }
+
+  if (status == NEW_WORD) {
+    for(int r = 0; r < MAX_LENGTH; r++) {
+      for (int c = 0; c < MAX_LENGTH; c++) {
+        cache[r][c] = 0;
+      }
+    }
+  }
+
+  if (cache[i][j]) return cache[i][j];
+
+  vector<int> result;
+  result.push_back(edit_distance_bonus(a, b+1, RECURSE) + 1);
+  result.push_back(edit_distance_bonus(a+1, b, RECURSE) + 1);
+  result.push_back(edit_distance_bonus(a+1, b+1, RECURSE) +(a[0] == b[0] ? 0 : 1));
+  if (i > 1 && j > 1 && a[0] == b[1] &&
+      a[1] == b[0])
+  result.push_back(edit_distance_bonus(a+2, b+2, RECURSE) + 1);
+  return cache[i][j] = *min_element(result.begin(), result.end());
+}
+

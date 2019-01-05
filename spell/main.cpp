@@ -33,7 +33,7 @@ int main() {
 
   cout << "The edit distance between 'korrectud' and 'corrected' is " << edit_distance("korrectud","corrected") << endl;
 
-  // cout << "The edit distance between 'nonexistential' and 'nonexistent' is " << edit_distance("nonexistential","nonexistent") << endl;
+  cout << "The edit distance between 'nonexistential' and 'nonexistent' is " << edit_distance("nonexistential","nonexistent") << endl;
 
   cout << endl;
   
@@ -56,7 +56,7 @@ int main() {
   corrected = spell_correct("nonexistential", fixed);
   cout << "The corrected spelling of 'nonexistential' is '"<< fixed << "'" << endl;
   cout << "The spell checker was " << (corrected ? "" : "NOT ") << "needed."<< endl <<endl;
-  /*  
+    
   cout << "=================== Bonus Question =====================" << endl << endl;
   cout << "The edit distance between 'an' and 'na' is " << edit_distance_bonus("an","na") << endl;
 
@@ -72,7 +72,6 @@ int main() {
 
   cout << "The edit distance between 'nonexistential' and 'nonexistent' is " << edit_distance_bonus("nonexistential","nonexistent") << endl;
 
-  */
   
   return 0;
 }
