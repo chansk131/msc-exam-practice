@@ -12,6 +12,6 @@ $(EXE): $(OBJ)
 -include $(OJB:.o=.d)
 
 clean:
-	rm -f $(OBJ) $(EXE) $(OJB:.o=.d)
+	rm -f $(OBJ) $(EXE) $(OBJ:.o=.d)
 
 .PHONY: clean
