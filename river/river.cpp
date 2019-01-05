@@ -110,96 +110,70 @@ const char *status_description(int code) {
   return "Unknown error";
 }
 
-struct Count {
-  int missionary;
-  int cannibal;
-  bool is_equal(const Count right) {
-    if (cannibal == right.cannibal && missionary == right.missionary) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-};
-
-bool get_left_count(const char *left, Count &left_count, int &boat_position) {
-  string input(left);
-  int count = input.length();
-
-  if (count > 7) {
-    cerr << "length of left is more than 7 char" << endl;
-    return false;
-  }
-
-  left_count.cannibal = 0;
-  left_count.missionary = 0;
-
-  for (int i = 0; i < count; i++) {
-    if (input[i] != 'M' && input[i] != 'C' && input[i] != 'B') {
-      cerr << "wrong input left" << endl;
-      return false;
-    } else if (input[i] == 'M') {
-      left_count.missionary++;
-    } else if (input[i] == 'C') {
-      left_count.cannibal++;
-    } else if (input[i] == 'B') {
-      boat_position = 1;
-    }
-  }
-  return true;
-}
-
-bool get_boat_count(const char *boat, Count &boat_count) {
-  string input(boat);
-  int count = input.length();
-
-  if (count > 2) {
-    cerr << "length of left is more than 7 char" << endl;
-    return false;
-  }
-
-  boat_count.cannibal = 0;
-  boat_count.missionary = 0;
-
-  for (int i = 0; i < count; i++) {
-    if (input[i] != 'M' && input[i] != 'C') {
-      cerr << "wrong input left" << endl;
-      return false;
-    } else if (input[i] == 'M') {
-      boat_count.missionary++;
-    } else if (input[i] == 'C') {
-      boat_count.cannibal++;
-    }
-  }
-  return true;
-}
-
 /* insert your functions here */
+bool get_left_count(const string left, int &left_missionary, int &left_cannibal, int &boat_position) {
+  if (left.size() > 7) {
+    return false;
+  }
+  
+  boat_position = count(left.begin(), left.end(), 'B');
+  left_missionary = count(left.begin(), left.end(), 'M');
+  left_cannibal = count(left.begin(), left.end(), 'C');
 
-char **make_river_scene(const char *left, const char *boat) {
+  if (boat_position > 1 || left.size() != boat_position + left_missionary + left_cannibal) {
+    return false;
+  }
+
+  return true;
+}
+
+bool get_boat_count(const string boat, int &boat_missionary, int &boat_cannibal) {
+  if (boat.size() > 2) {
+    return false;
+  }
+  boat_missionary = count(boat.begin(), boat.end(), 'M');
+  boat_cannibal = count(boat.begin(), boat.end(), 'C');
+
+  if (boat.size() != boat_missionary + boat_cannibal) {
+    return false;
+  }
+
+  return true;
+}
+
+char **make_river_scene(const string left, const string boat) {
   char **scene = create_scene();
+  
   add_to_scene(scene, 0, 0, "bank.txt");
   add_to_scene(scene, 0, 53, "bank.txt");
   add_to_scene(scene, 3, 30, "sun.txt");
   add_to_scene(scene, 19, 19, "river.txt");
+  
+  int left_missionary, left_cannibal;
+  int boat_missionary, boat_cannibal;
+  int right_missionary, right_cannibal;
 
-  Count left_count, boat_count, right_count;
-  int boat_position = 0;
+  int boat_position;
 
-  // check left input
-  if (!get_left_count(left, left_count, boat_position)) return scene;
+  if (!get_left_count(left, left_missionary, left_cannibal, boat_position)) {
+    return scene;
+  }
+  if (!get_boat_count(boat, boat_missionary, boat_cannibal)) {
+    return scene;
+  }
 
-  // check boat input
-  if (!get_boat_count(boat, boat_count)) return scene;
+  right_missionary = 3 - left_missionary - boat_missionary;
+  right_cannibal = 3 - boat_cannibal - left_cannibal;
 
-  right_count.missionary = 3 - left_count.missionary - boat_count.missionary;
-  right_count.cannibal = 3 - left_count.cannibal - boat_count.cannibal;
+  if (right_missionary < 0 || right_cannibal < 0 || right_missionary > 3 || right_cannibal > 3) {
+    return scene;
+  }
 
   // draw left bank
-  for (int i = 0; i < left_count.missionary; i++) {
+  for (int i = 0; i < left_missionary; i++) {
     add_to_scene(scene, 2, 6 * i + 1, "missionary.txt");
   }
-  for (int i = 0; i < left_count.cannibal; i++) {
+  for (int i = 0; i < left_cannibal; i++) {
     add_to_scene(scene, 11, 6 * i + 1, "cannibal.txt");
   }
 
@@ -211,202 +185,244 @@ char **make_river_scene(const char *left, const char *boat) {
   }
   // draw boat
   add_to_scene(scene, 17, boat_draw_position, "boat.txt");
-  for (int i = 0; i < boat_count.missionary; i++) {
+  for (int i = 0; i < boat_missionary; i++) {
     add_to_scene(scene, 11, 6 * i + boat_draw_position + 3, "missionary.txt");
   }
-  for (int i = 0; i < boat_count.cannibal; i++) {
+  for (int i = 0; i < boat_cannibal; i++) {
     add_to_scene(scene, 11, 6 * i + boat_draw_position + 3, "cannibal.txt");
   }
 
   // draw right bank
-  for (int i = 0; i < right_count.missionary; i++) {
+  for (int i = 0; i < right_missionary; i++) {
     add_to_scene(scene, 2, 6 * i + 54, "missionary.txt");
   }
-  for (int i = 0; i < right_count.cannibal; i++) {
+  for (int i = 0; i < right_cannibal; i++) {
     add_to_scene(scene, 11, 6 * i + 54, "cannibal.txt");
   }
 
   return scene;
 }
 
-Status perform_crossing(char *left, const char *targets) {
-  Status state = VALID_GOAL_STATE;
+void make_and_print_scene(const string left, const string targets) {
+  char **scene = make_river_scene(left, targets);
+  print_scene(scene);
+  destroy_scene(scene);
+}
 
-  Count left_count, boat_count, right_count;
-  int boat_position = 0;
-
-  // check left input
-  if (!get_left_count(left, left_count, boat_position)) {
+string generate_left(int missionary, int cannibal, int boat_position) {
+  string left;
+  for (int i = 0; i < missionary; i++) {
+    left += 'M';
   }
-
-  // check boat input
-  if (!get_boat_count(targets, boat_count)) {
+  for (int i = 0; i < cannibal; i++) {
+    left += 'C';
   }
-
   if (boat_position) {
-    left_count.missionary -= boat_count.missionary;
-    left_count.cannibal -= boat_count.cannibal;
+    left += 'B';
   }
-  right_count.missionary = 3 - left_count.missionary - boat_count.missionary;
-  right_count.cannibal = 3 - left_count.cannibal - boat_count.cannibal;
+  return left;
+}
 
-  if (right_count.missionary < 0) {
+Status perform_crossing(char *left, const string targets) {
+  string temp_left;
+  // check if targets can fit the boat
+  if (targets.size() < 1 || targets.size() > 2) {
     return ERROR_INVALID_MOVE;
   }
-  if (right_count.cannibal < 0) {
+
+  if (temp_left.size() > 7) {
+    return ERROR_INPUT_STREAM_ERROR;
+  }
+
+  int left_missionary, left_cannibal;
+  int boat_missionary, boat_cannibal;
+  int right_missionary, right_cannibal;
+
+  int boat_position;
+
+  if (!get_left_count(left, left_missionary, left_cannibal, boat_position)) {
+    return ERROR_INPUT_STREAM_ERROR;
+  }
+  if (!get_boat_count(targets, boat_missionary, boat_cannibal)) {
     return ERROR_INVALID_MOVE;
   }
 
-  // loading the boat
-  if (boat_position) {
-    string new_left = "B";
-    for (int i = 0; i < left_count.missionary; i++) {
-      new_left += "M";
-    }
-    for (int i = 0; i < left_count.cannibal; i++) {
-      new_left += "C";
-    }
-    strcpy(left, new_left.c_str());
-  }
-  char **scene = create_scene();
-  scene = make_river_scene(left, targets);
-  // print_scene(scene);
+  right_missionary = 3 - left_missionary;
+  right_cannibal = 3 - left_cannibal;
 
-  // crossing the river
-  string new_left;
-  if (!boat_position) {
-    boat_position = 1;
-    new_left += "B";
+  // loading boat
+  if (boat_position) {
+    left_missionary -= boat_missionary;
+    left_cannibal -= boat_cannibal;
   } else {
+    right_missionary -= boat_missionary;
+    right_cannibal -= boat_cannibal;
+  }
+
+  if (right_missionary < 0 || left_missionary < 0) {
+    return ERROR_INVALID_MISSIONARY_COUNT;
+  } else if (right_cannibal < 0 || right_missionary < 0) {
+    return ERROR_INVALID_CANNIBAL_COUNT;
+  }
+
+  string crossing_left;
+  crossing_left = generate_left(left_missionary, left_cannibal, boat_position);
+
+  // make_and_print_scene(crossing_left, targets);
+
+  // crossing, change boat position
+  if (boat_position) {
+    crossing_left.pop_back();
     boat_position = 0;
+  } else {
+    crossing_left += 'B';
+    boat_position = 1;
   }
-  for (int i = 0; i < left_count.missionary; i++) {
-    new_left += "M";
-  }
-  for (int i = 0; i < left_count.cannibal; i++) {
-    new_left += "C";
-  }
-  strcpy(left, new_left.c_str());
-  scene = make_river_scene(left, targets);
-  // print_scene(scene);
 
-  // unloading boat
+  // make_and_print_scene(crossing_left, targets);
+
+  // unload
   if (boat_position) {
-    new_left = "B";
-    left_count.missionary += boat_count.missionary;
-    left_count.cannibal += boat_count.cannibal;
-    for (int i = 0; i < left_count.missionary; i++) {
-      new_left += "M";
-    }
-    for (int i = 0; i < left_count.cannibal; i++) {
-      new_left += "C";
-    }
-    strcpy(left, new_left.c_str());
+    // boat at the left
+    left_missionary += boat_missionary;
+    left_cannibal += boat_cannibal;
   } else {
-    right_count.missionary += boat_count.missionary;
-    right_count.cannibal += boat_count.cannibal;
-  }
-  boat_count.cannibal = 0;
-  boat_count.missionary = 0;
-
-  scene = make_river_scene(left, "");
-  // print_scene(scene);
-
-  // check result
-  if (right_count.missionary && right_count.missionary < right_count.cannibal) {
-    state = ERROR_MISSIONARIES_EATEN;
-  } else if (new_left.length() == 0) {
-    state = VALID_GOAL_STATE;
-  } else {
-    state = VALID_NONGOAL_STATE;
+    right_missionary += boat_missionary;
+    right_cannibal += boat_cannibal;
   }
 
-  return state;
+  crossing_left = generate_left(left_missionary, left_cannibal, boat_position);
+
+  // make_and_print_scene(crossing_left, "");
+
+  strcpy(left, crossing_left.c_str());
+
+  if ((left_missionary > 0 && left_missionary < left_cannibal) || (right_missionary > 0 && right_missionary < right_cannibal)) {
+    return ERROR_MISSIONARIES_EATEN;
+  }
+
+  if (crossing_left == "") {
+    return VALID_GOAL_STATE;
+  } else {
+    return VALID_NONGOAL_STATE;
+  }
 }
 
 Status play_game() {
+  char left[] = "MMMCCCB";
   string target;
-
-  char left[8] = "BCCCMMM";
-
   Status state = VALID_NONGOAL_STATE;
 
   while (state == VALID_NONGOAL_STATE) {
+    cout << "Please enter the target Missionary (M), cannibal (C)" << endl;
     cin >> target;
-    state = perform_crossing(left, target.c_str());
-  }
 
+    state = perform_crossing(left, target);
+  } 
   return state;
 }
 
-struct Move {
-  Count count;
-  string move;
+string targets[] = {"MM", "MC", "CC", "M", "C"};
+
+struct History {
+  string left, boat;
 };
 
-bool is_history_duplicated(vector<Move> &history, Move &move) {
-  if (!history.size()) return false;
-  vector<Move>::iterator it;
-  for(it = history.begin(); it != history.end(); ++it) {
-    if ((*it).move == move.move) {
-      if ((*it).count.is_equal(move.count)) {
-        return true;
-      }
-    }
+bool is_left_equal(string left1, char * left2) {
+  int missionary1, cannibal1, boat_position1;
+  int missionary2, cannibal2, boat_position2;
+
+  get_left_count(left1, missionary1, cannibal1, boat_position1);
+  get_left_count(left2, missionary2, cannibal2, boat_position2);
+
+  if (missionary1 == missionary2 && cannibal1 == cannibal2 && boat_position1 == boat_position2) {
+    return true;
+  }
+
+  return false;
+}
+
+bool is_state_equal(History history, char * left, string target) {
+  if (history.boat != target) return false;
+  return is_left_equal(history.left, left);
+}
+
+bool is_target_state_duplicated(char *left, string target, vector<History> &history) {
+
+  if (history.size() % 2 && history.back().boat == target) return true;
+
+  for(std::vector<History>::iterator it = history.begin(); it != history.end(); ++it) {
+    if (is_state_equal(*it, left, target)) return true;
   }
   return false;
 }
 
-string moves[] = {"MM", "MC", "CC", "M", "C"};
+bool is_crossing_valid(char *left, string target) {
+  Status state = perform_crossing(left, target);
+  if (state == VALID_GOAL_STATE || state == VALID_NONGOAL_STATE) return true;
+  return false;
+}
+
+Status find_solution(char *left, char *answer, vector<History> &history) {
+  History now;
+  now.left = left;
+
+  Status state;
+  for (int i = 0; i < 5; i++) {
+
+    if (is_target_state_duplicated(left, targets[i], history)) {
+      continue;
+    }
+    if (!is_crossing_valid(left, targets[i])) {
+      strcpy(left, now.left.c_str());
+      continue;
+    }
+
+    now.boat = targets[i];
+    history.push_back(now);
+
+    if (strcmp(left, "") == 0) {
+      return VALID_GOAL_STATE;
+    }
+
+    state = find_solution(left, answer, history);
+    if (state == VALID_GOAL_STATE) {
+      return state;
+    }
+    strcpy(left, history.back().left.c_str());
+    history.pop_back();
+    
+  }
+
+  return ERROR_BONUS_NO_SOLUTION;
+}
+
+void get_answer(vector<History> &history, char *answer) {
+  string temp_ans;
+  for(std::vector<History>::iterator it = history.begin(); it != history.end(); ++it) {
+    temp_ans += it->boat;
+    temp_ans += ',';
+  }
+
+  temp_ans.pop_back();
+  strcpy(answer, temp_ans.c_str());
+}
 
 Status find_solution(char *left, char *answer) {
-  // string save_left(left);
-  // Status state;
-  // Move move;
-  // Count left_count;
-  // int boat_position;
+  char save_left[8];
+  strcpy(save_left, left);
+  string target;
+  Status state;
 
-  // vector<Move> history;
+  vector<History> history;
 
-  // if (strcmp(left, "") == 0) {
-  //   return VALID_GOAL_STATE;
-  // }
+  state = find_solution(left, answer, history);
 
-  // while (true) {
-  //   for (int i = 0; i < 5; i++) {
+  if (state != VALID_GOAL_STATE) {
+    return ERROR_BONUS_NO_SOLUTION;
+  }
 
-  //     state = perform_crossing(left, moves[i].c_str());
+  get_answer(history, answer);
 
-  //     if (state != VALID_GOAL_STATE && state != VALID_NONGOAL_STATE) {
-  //       strcpy(left, save_left.c_str());
-  //     } else if (state == VALID_NONGOAL_STATE) {
-  //       get_left_count(left, left_count, boat_position);
-  //       // check for duplicate
-  //       move.count = left_count;
-  //       move.move = moves[i];
-  //       if (is_history_duplicated(history, move)) {
-  //         strcpy(left, save_left.c_str());
-  //         // cout << "reverted " << left << " ";
-  //       } else {
-  //         history.push_back(move);
-  //         save_left = left;
-  //         cout << move.move << "," << left << endl;
-  //       }
-
-  //     } else {
-
-  //       return VALID_GOAL_STATE;
-  //     }
-
-  //   }
-  //   if (!history.size()) {
-  //     return ERROR_BONUS_NO_SOLUTION;
-  //   } else {
-  //     cout << "new " << left << " " << save_left << endl;
-  //     strcpy(left, save_left.c_str());
-  //   }
-  // }
-
-  
-  // return state;
+  return state;
 }
