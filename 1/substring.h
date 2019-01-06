@@ -2,6 +2,7 @@
 #define SUBSTRING_H
 
 #include <cstring>
+#include <string>
 
 bool is_prefix(const char * , const char * );
 int substring_position(const char * , const char *);

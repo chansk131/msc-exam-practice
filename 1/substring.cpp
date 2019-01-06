@@ -14,13 +14,7 @@ bool is_prefix(const char* first, const char* second) {
 
 int substring_position(const char* first, const char* second) {
   int count = 0;
-  if (!*first) return 0;
-  if (!*second) return -1;
-
-  if (is_prefix(first, second)) return count;
-
-  count++;
-  count = substring_position(first, second + 1, count);
+  count = substring_position(first, second, count);
 
   return count;
 }
